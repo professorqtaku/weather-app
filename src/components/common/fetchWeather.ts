@@ -43,6 +43,7 @@ const CURRENT_PARAMS = [
   "apparent_temperature",
   "rain",
 ];
+
 const HOURLY_PARAMS = ["temperature_2m", "precipitation"];
 const DAILY_PARAMS = ["weather_code", "temperature_2m_max,temperature_2m_min"];
 

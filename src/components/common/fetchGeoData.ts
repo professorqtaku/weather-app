@@ -2,6 +2,13 @@ import axios from "axios";
 
 const endpoint = "https://geocoding-api.open-meteo.com/v1/search"
 
+export enum Status {
+    SUCCESS,
+    LOADING,
+    ERROR,
+    IDLE
+}
+
 export type GeoProps = {
     name: String;
 }

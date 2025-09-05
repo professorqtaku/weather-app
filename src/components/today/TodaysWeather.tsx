@@ -3,11 +3,6 @@ import type { GeoData } from "../common/fetchGeoData";
 import { TempUnit, type WeatherData } from "../common/fetchWeather";
 import WeatherNotFound from "./WeatherNotFound";
 
-enum WeatherIcon {
-    SUNNY,
-    CLOUDY
-}
-
 type TodaysWeatherProps = {
     weather?: WeatherData | null
     geoData?: GeoData | null
@@ -39,8 +34,8 @@ const TodaysWeather = (props: TodaysWeatherProps) => {
         </div>
         
         <div className="w-1/2 bg-blue-800">
-            <h1>{currentWeather.weatherCode}</h1>
-            <p>{currentWeather.windSpeed} km/h</p>
+            <h1 id="weather-icon">{currentWeather.weatherCode}</h1>
+            <p id="weather-wind-speed">{currentWeather.windSpeed} km/h</p>
         </div>
     </div>
 }

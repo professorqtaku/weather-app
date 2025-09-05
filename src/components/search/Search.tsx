@@ -2,14 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import _debounce from "lodash/debounce";
 import DebouncedButton from "./DebouncedButton";
 import fetchWeather from "../common/fetchWeather";
-import fetchGeoData from "../common/fetchGeoData";
+import fetchGeoData, { Status } from "../common/fetchGeoData";
 
 type SearchProps = {
   setWeatherData: Function;
   setGeoData: Function;
+  setSearchStatus: Function;
 };
 const Search = (props: SearchProps) => {
-  const { setWeatherData, setGeoData } = props;
+  const { setWeatherData, setGeoData, setSearchStatus } = props;
   const [inputValue, setInputValue] = useState("");
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +23,7 @@ const Search = (props: SearchProps) => {
     const geoData = await fetchGeoData({ name: inputValue });
 
     if (geoData == null) {
-      // handle error
+      setSearchStatus(Status.ERROR);
       return;
     }
 
@@ -30,6 +31,7 @@ const Search = (props: SearchProps) => {
     const weatherData = await fetchWeather(geoData[0]);
     setGeoData(geoData[0]);
     setWeatherData(weatherData);
+    setSearchStatus(Status.SUCCESS);
   };
 
   // update onInput
@@ -52,7 +54,7 @@ const Search = (props: SearchProps) => {
           name="search"
           type="text"
           placeholder="Stad/land"
-          className="min-w-0 rounded-lg h-auto py-2 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 w-full focus:border-pink-500 focus:outline-none transition duration-300 ease-in-out" 
+          className="min-w-0 rounded-lg h-auto py-2 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 w-full focus:outline-none transition duration-300 ease-in-out" 
           value={inputValue}
           onChange={handleInput}
         />
