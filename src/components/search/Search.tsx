@@ -8,9 +8,10 @@ type SearchProps = {
   setWeatherData: Function;
   setGeoData: Function;
   setSearchStatus: Function;
+  searchStatus: Status;
 };
 const Search = (props: SearchProps) => {
-  const { setWeatherData, setGeoData, setSearchStatus } = props;
+  const { setWeatherData, setGeoData, setSearchStatus, searchStatus } = props;
   const [inputValue, setInputValue] = useState("");
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,6 +19,7 @@ const Search = (props: SearchProps) => {
   };
 
   const handleSearch = async () => {
+    setSearchStatus(Status.LOADING);
     console.log(inputValue);
     localStorage.setItem("latest-input", inputValue);
     const geoData = await fetchGeoData({ name: inputValue });
@@ -60,7 +62,7 @@ const Search = (props: SearchProps) => {
         />
       </div>
       <div className="w-1/6 ml-2">
-        <DebouncedButton title="Searcha" onClick={handleSearch} />
+        <DebouncedButton title="Search" onClick={handleSearch} status={searchStatus} />
       </div>
     </div>
   );
