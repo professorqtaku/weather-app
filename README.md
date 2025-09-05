@@ -33,6 +33,9 @@ This information can be fetched from [Open Meteo's GeoCoding API](https://open-m
 #### 2. Current Weather
 With the data fetched, we'll  display it in this section. Time taken is about 1 hr.
 
+#### 3. Upcoming days
+This is missing due to time limit.
+
 ## Further development
 * Create the daily weather section, here I would make a toolbar with date, max/min temperature and then render the list of info.
 * Make a design in maybe Figma, I felt stuck when not having a clear vision of the design.
