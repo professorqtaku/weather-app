@@ -57,12 +57,8 @@ function WeatherApp() {
                 <div className="glass-panel p-lg rounded-[2rem]">
                   <div className="flex justify-between items-center mb-lg">
                     <h2 className="font-headline-md text-headline-md text-on-surface">Hourly Forecast</h2>
-                    <div className="bg-surface-container rounded-full p-1 flex gap-1">
-                      <button className="bg-primary-container text-white px-4 py-1 rounded-full font-label-caps text-label-caps transition-all">HOURLY</button>
-                      <button className="text-on-surface-variant px-4 py-1 rounded-full font-label-caps text-label-caps hover:bg-white/50 transition-all">DAILY</button>
-                    </div>
                   </div>
-                  <div className="flex gap-md overflow-x-auto pb-4 scrollbar-hide">
+                  <div className="flex gap-md oveflow-x-auto pb-4 scrollbar-hide">
                     {/* Hour Items - Mock data for now */}
                     <div className="flex-shrink-0 flex flex-col items-center gap-3 bg-white/60 p-md rounded-2xl border border-white/40 min-w-[80px]">
                       <span className="font-label-caps text-label-caps text-on-surface-variant">Now</span>
@@ -119,8 +115,7 @@ function WeatherApp() {
                   </div>
 
                   {/* 7-Day Forecast (Full Width) */}
-                  <div className="md:col-span-2 glass-panel p-lg rounded-[2rem]">
-                    <h3 className="font-headline-md text-headline-md text-on-surface mb-lg">7-Day Forecast</h3>
+                  <div className="md:col-span-2">
                     <UpcomingWeather weather={weatherData} temperatureUnit={temperatureUnit} />
                   </div>
                 </div>

@@ -20,7 +20,6 @@ const Header = ({ temperatureUnit, setTemperatureUnit }: HeaderProps) => {
             <input className="bg-transparent border-none focus:ring-0 text-body-md text-on-surface-variant w-48" placeholder="Search city..." type="text"/>
           </div>
           <TemperatureToggle temperatureUnit={temperatureUnit} setTemperatureUnit={setTemperatureUnit} />
-          <button className="material-symbols-outlined text-primary text-2xl active:scale-95 transition-transform duration-200">settings</button>
         </div>
       </div>
     </header>

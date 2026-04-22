@@ -6,6 +6,7 @@ const url = "https://api.open-meteo.com/v1/forecast";
 export type WeatherData = {
   current: CurrentWeatherData;
   daily: DailyWeatherData[];
+  hourly: HourlyWeatherData[];
 };
 
 export type CurrentWeatherData = {
@@ -27,6 +28,12 @@ export type DailyWeatherData = {
   temperatureMin: number;
 };
 
+export type HourlyWeatherData = {
+  time: Date;
+  temperature: number;
+  weatherCode: number;
+};
+
 export enum TempUnit {
   CELCIUS = "°C",
   FAHRENHEIT = "°F"
@@ -46,6 +53,10 @@ const fetchWeather = async (props: GeoData): Promise<WeatherData> => {
       "apparent_temperature",
       "rain"
     ],
+    hourly: [
+      "temperature_2m",
+      "weather_code"
+    ],
     daily: [
       "weather_code",
       "temperature_2m_max",
@@ -61,6 +72,7 @@ const fetchWeather = async (props: GeoData): Promise<WeatherData> => {
   const utcOffsetSeconds = response.utcOffsetSeconds();
 
   const current = response.current()!;
+  const hourly = response.hourly()!;
   const daily = response.daily()!;
 
   const weatherData: WeatherData = {
@@ -75,8 +87,19 @@ const fetchWeather = async (props: GeoData): Promise<WeatherData> => {
       apparentTemperature: current.variables(6)!.value(),
       rain: current.variables(7)!.value(),
     },
+    hourly: [],
     daily: [],
   };
+
+  const hourlyLength = hourly.variables(0)!.valuesLength();
+  const hourlyStartTime = Number(hourly.time());
+  for (let i = 0; i < hourlyLength; i++) {
+    weatherData.hourly.push({
+      time: new Date((hourlyStartTime + utcOffsetSeconds + i * 3600) * 1000), // Add hours in seconds
+      temperature: hourly.variables(0)!.valuesArray()![i],
+      weatherCode: hourly.variables(1)!.valuesArray()![i],
+    });
+  }
 
   const dailyLength = daily.variables(0)!.valuesLength();
   const startTime = Number(daily.time());
