@@ -9,32 +9,28 @@ In the root of the folder, runt these following commands:
 
 > visit https://localhost:5173
 
-## Review of the project
-
-Time available for the project: 4 hrs
-
-Actual taken time: 6hrs
-
 ### How it went
 
 Firstly, I divided the app in three main features
 1. Search
-2. Current weather
+2. Todays weather
 3. Upcoming days
 
-From this I made an very roughtly sketch of the application (15min)
+From this I made an very roughtly sketch of the application (15min) at first. Then used Google Stitch AI tool to create the wireframes.
 
 #### These are done:
 #### 1. Search bar
 
 The [Open Meteo API](https://open-meteo.com/en/docs) takes location in form of latitude and longitude.
-This information can be fetched from [Open Meteo's GeoCoding API](https://open-meteo.com/en/docs/geocoding-api). We'll get the first found location and use the geo data to further do fetch weather data. This took about 3 hr.
+This information can be fetched from [Open Meteo's GeoCoding API](https://open-meteo.com/en/docs/geocoding-api). We'll get the first found location and use the geo data to further do fetch weather data.
+
+When searching, a drowpdown of the best matched locations will show, then can me selected to fetch the weather data.
 
 #### 2. Current Weather
-With the data fetched, we'll  display it in this section. Time taken is about 1 hr.
+With the data fetched, we'll  display the weather in hourly for today.
 
 #### 3. Upcoming days
-This is missing due to time limit.
+Another section to show the weather of upcoming days.
 
 ## Further development
 * Create the daily weather section, here I would make a toolbar with date, max/min temperature and then render the list of info.
