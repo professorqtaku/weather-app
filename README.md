@@ -1,5 +1,9 @@
 #  Weather app (React + TypeScript + Vite)
 
+## Preview
+
+Project deployed in Vercel: https://www.professorqtaku-weather-app.vercel.app
+
 ## How to run 
 In the root of the folder, runt these following commands:
 
