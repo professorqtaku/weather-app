@@ -28,68 +28,36 @@ const TodaysWeather = (props: TodaysWeatherProps) => {
   };
 
   return (
-    <>
-      {/* Hero Weather Section */}
-      <section className="glass-panel rounded-[32px] p-xl mb-lg text-center relative overflow-hidden">
-        {/* Background Decoration */}
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#FFFDB5] rounded-full blur-[60px] opacity-40"></div>
-        <div className="relative z-10">
-          <p className="font-label-caps text-primary uppercase mb-xs">Current Location</p>
-          <h2 className="font-headline-lg text-on-surface mb-md">{geoData.name}, {geoData.country}</h2>
-          <div className="flex flex-col items-center mb-md">
-            <span className="material-symbols-outlined text-[80px] text-primary" style={{fontVariationSettings: "'FILL' 1"}}>{icon}</span>
-            <div className="flex items-start justify-center">
-              <span className="font-display-temp text-primary">{convertTemp(currentWeather.temperature)}</span>
-              <span className="font-headline-md text-primary-container mt-4">{temperatureUnit}</span>
-            </div>
-            <p className="font-body-lg text-on-surface-variant font-semibold">{description}</p>
+    <div id="todays_weather" className="glass-panel p-xl rounded-[2rem] relative overflow-hidden shadow-[0_30px_60px_-15px_rgba(54,116,181,0.15)]">
+      {/* Background Glow */}
+      <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#FFFDB5] blur-[80px] opacity-40"></div>
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-12">
+          <div>
+            <h1 className="font-headline-lg text-headline-lg text-on-surface">{geoData.name}, {geoData.country}</h1>
+            <p className="font-body-md text-body-md text-on-surface-variant">Monday, 12 Aug 2024</p>
           </div>
-          <div className="grid grid-cols-3 gap-md border-t border-white/40 pt-lg mt-md">
-            <div className="flex flex-col items-center">
-              <span className="material-symbols-outlined text-primary mb-xs" style={{fontVariationSettings: "'FILL' 0"}}>air</span>
-              <p className="font-label-caps text-on-surface-variant">Wind</p>
-              <p className="font-body-md font-bold text-on-surface">{Math.round(currentWeather.windSpeed)} mph</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="material-symbols-outlined text-primary mb-xs" style={{fontVariationSettings: "'FILL' 0"}}>humidity_mid</span>
-              <p className="font-label-caps text-on-surface-variant">Humidity</p>
-              <p className="font-body-md font-bold text-on-surface">{Math.round(currentWeather.relativeHumidity)}%</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="material-symbols-outlined text-primary mb-xs" style={{fontVariationSettings: "'FILL' 0"}}>umbrella</span>
-              <p className="font-label-caps text-on-surface-variant">Rain</p>
-              <p className="font-body-md font-bold text-on-surface">{Math.round(currentWeather.rain * 100)}%</p>
-            </div>
+          <span className="bg-primary-container text-white px-3 py-1 rounded-full font-label-caps text-label-caps">LIVE</span>
+        </div>
+        <div className="flex items-center gap-4 mb-8">
+          <span className="material-symbols-outlined text-[80px] text-primary" style={{fontVariationSettings: "'FILL' 1"}}>{icon}</span>
+          <div className="flex flex-col gap-4">
+            <span className="font-display-temp text-display-temp text-on-surface">{convertTemp(currentWeather.temperature)}</span>
+            <span className="font-headline-md text-headline-md text-on-surface-variant -mt-4">{description}</span>
           </div>
         </div>
-      </section>
-
-      {/* Bento Grid Highlights */}
-      <div className="grid grid-cols-2 gap-lg mb-lg">
-        {/* Air Quality */}
-        <div className="glass-panel rounded-2xl p-md">
-          <div className="flex items-center gap-sm mb-sm">
-            <span className="material-symbols-outlined text-primary text-sm">aq</span>
-            <p className="font-label-caps text-on-surface-variant">Air Quality</p>
+        <div className="grid grid-cols-2 gap-md">
+          <div className="bg-white/40 p-md rounded-xl border border-white/20">
+            <p className="font-label-caps text-label-caps text-on-surface-variant mb-1">FEELS LIKE</p>
+            <p className="font-headline-md text-headline-md text-on-surface">{convertTemp(currentWeather.apparentTemperature)}°</p>
           </div>
-          <p className="font-headline-md text-on-surface">24 — Good</p>
-          <div className="w-full h-1.5 bg-secondary-fixed rounded-full mt-md overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[#D1F8EF] to-[#3674B5]" style={{width: '24%'}}></div>
-          </div>
-        </div>
-        {/* UV Index */}
-        <div className="glass-panel rounded-2xl p-md">
-          <div className="flex items-center gap-sm mb-sm">
-            <span className="material-symbols-outlined text-primary text-sm">wb_sunny</span>
-            <p className="font-label-caps text-on-surface-variant">UV Index</p>
-          </div>
-          <p className="font-headline-md text-on-surface">4 — Moderate</p>
-          <div className="w-full h-1.5 bg-secondary-fixed rounded-full mt-md overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[#D1F8EF] to-[#3674B5]" style={{width: '40%'}}></div>
+          <div className="bg-white/40 p-md rounded-xl border border-white/20">
+            <p className="font-label-caps text-label-caps text-on-surface-variant mb-1">HUMIDITY</p>
+            <p className="font-headline-md text-headline-md text-on-surface">{Math.round(currentWeather.relativeHumidity)}%</p>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

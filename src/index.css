@@ -113,6 +113,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+div#root {
+  min-width: 100vw;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 body {
   margin: 0;
   display: flex;

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import _debounce from "lodash/debounce";
 import fetchWeather, { type WeatherData } from "../common/fetchWeather";
 import fetchGeoData, { Status, type GeoData } from "../common/fetchGeoData";
@@ -15,6 +16,8 @@ const Search = (props: SearchProps) => {
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState<GeoData[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const fetchSuggestions = useCallback(
     _debounce(async (query: string) => {
@@ -38,6 +41,17 @@ const Search = (props: SearchProps) => {
   useEffect(() => {
     fetchSuggestions(inputValue);
   }, [inputValue, fetchSuggestions]);
+
+  useEffect(() => {
+    if (showDropdown && searchRef.current) {
+      const rect = searchRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+  }, [showDropdown]);
 
   useEffect(() => {
     return () => {
@@ -85,7 +99,7 @@ const Search = (props: SearchProps) => {
   };
 
   return (
-    <div className="relative">
+    <div ref={searchRef} className="relative">
       <div className="glass-panel rounded-xl flex items-center px-md py-3 shadow-[0_30px_60px_-15px_rgba(54,116,181,0.1)] focus-within:ring-2 focus-within:ring-primary/20 transition-all">
         <span className="material-symbols-outlined text-outline mr-sm">search</span>
         <input
@@ -97,8 +111,16 @@ const Search = (props: SearchProps) => {
           onKeyPress={handleKeyPress}
         />
       </div>
-      {showDropdown && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 glass-panel rounded-xl shadow-xl overflow-hidden z-20 max-h-60 overflow-y-auto">
+      {showDropdown && suggestions.length > 0 && createPortal(
+        <div
+          id="search_dropdown"
+          className="fixed z-[10000] glass-panel rounded-xl shadow-xl overflow-hidden max-h-60 overflow-y-auto"
+          style={{
+            top: `${dropdownPosition.top + 8}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`
+          }}
+        >
           {suggestions.map((suggestion, index) => (
             <div
               key={index}
@@ -108,7 +130,8 @@ const Search = (props: SearchProps) => {
               <p className="font-body-md text-on-surface">{suggestion.name}, {suggestion.country}</p>
             </div>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

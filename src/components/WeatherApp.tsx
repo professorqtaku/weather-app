@@ -5,7 +5,8 @@ import UpcomingWeather from "./upcoming/UpcomingWeather";
 import { TempUnit, type WeatherData } from "./common/fetchWeather";
 import { Status, type GeoData } from "./common/fetchGeoData";
 import WeatherNotFound from "./today/WeatherNotFound";
-import TemperatureToggle from "./TemperatureToggle";
+import Header from "./Header";
+import Footer from "./Footer";
 
 function WeatherApp() {
   // get from localStorage
@@ -15,77 +16,128 @@ function WeatherApp() {
   const [temperatureUnit, setTemperatureUnit] = useState<TempUnit>(TempUnit.CELCIUS);
 
   return (
-    <div className="min-h-screen bg-background text-on-background font-body-md mesh-gradient flex flex-col">
-      {/* TopAppBar */}
-      <header className="sticky top-0 w-full z-50 border-b border-white/40 bg-white/60 backdrop-blur-[20px] shadow-[0_30px_60px_-15px_rgba(54,116,181,0.15)]">
-        <div className="flex justify-between items-center px-margin-mobile py-4 max-w-7xl mx-auto">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>cloudy_snowing</span>
-            <h1 className="text-2xl font-bold tracking-tighter text-primary font-headline-lg">SkyGlass</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <TemperatureToggle temperatureUnit={temperatureUnit} setTemperatureUnit={setTemperatureUnit} />
-            <button className="hover:bg-white/80 transition-all duration-300 p-2 rounded-full active:scale-95 transition-transform duration-200">
-              <span className="material-symbols-outlined text-primary">search</span>
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="bg-mesh min-h-screen flex flex-col font-body-md text-on-surface">
+      <Header temperatureUnit={temperatureUnit} setTemperatureUnit={setTemperatureUnit} />
 
-      <main className="flex-grow px-margin-mobile py-lg max-w-7xl mx-auto w-full">
-        {/* Search Bar Component */}
-        <div className="mb-lg">
-          <Search setWeatherData={setWeatherData} setGeoData={setGeoData} setSearchStatus={setSearchStatus} searchStatus={searchStatus} />
-        </div>
-
-        {searchStatus === Status.SUCCESS && weatherData && geoData && (
-          <>
-            {/* Hero Weather Section */}
-            <TodaysWeather weather={weatherData} geoData={geoData} temperatureUnit={temperatureUnit} />
-
-            {/* 7-Day Forecast Section */}
-            <UpcomingWeather weather={weatherData} temperatureUnit={temperatureUnit} />
-
-            {/* Weather Alerts */}
-            <div className="mb-xl">
-              <div className="bg-tertiary-container/10 border border-tertiary-container/20 rounded-2xl p-md flex gap-md items-start">
-                <span className="material-symbols-outlined text-tertiary-container" style={{fontVariationSettings: "'FILL' 1"}}>warning</span>
-                <div>
-                  <p className="font-label-caps text-tertiary-container mb-xs">Weather Alert</p>
-                  <p className="font-body-md font-bold text-on-surface">Dense Fog Advisory until 10:00 AM</p>
-                  <p className="font-body-md text-on-surface-variant text-sm mt-xs">Visibility reduced to less than 1/4 mile in some areas. Drive with caution.</p>
-                </div>
+      <main className="flex-grow max-w-7xl mx-auto w-full px-5 py-8 md:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+          <section className="lg:col-span-4 flex flex-col gap-lg relative">
+            <div id="search_bar" className="glass-panel p-xl rounded-[2rem] relative shadow-[0_30px_60px_-15px_rgba(54,116,181,0.15)]">
+              {/* Background Glow */}
+              <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#FFFDB5] blur-[80px] opacity-40"></div>
+              <div className="relative z-10">
+                <Search setWeatherData={setWeatherData} setGeoData={setGeoData} setSearchStatus={setSearchStatus} searchStatus={searchStatus} />
               </div>
             </div>
-          </>
-        )}
 
-        {searchStatus === Status.ERROR && <WeatherNotFound />}
-        {searchStatus === Status.IDLE && <p className="text-on-surface">Search for a city to get started.</p>}
+            {searchStatus === Status.SUCCESS && weatherData && geoData && (
+              <>
+                {/* Current Weather Hero */}
+                <TodaysWeather weather={weatherData} geoData={geoData} temperatureUnit={temperatureUnit} />
+
+                {/* Small Alert Card */}
+                <div className="bg-tertiary-container/10 border-tertiary-container/20 border glass-panel p-md rounded-2xl flex items-center gap-4">
+                  <div className="bg-tertiary text-white w-12 h-12 rounded-xl flex items-center justify-center">
+                    <span className="material-symbols-outlined">warning</span>
+                  </div>
+                  <div>
+                    <p className="font-label-caps text-label-caps text-tertiary">WEATHER ALERT</p>
+                    <p className="font-body-md text-body-md text-on-surface font-semibold">High UV Index today</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </section>
+
+          {/* Main Content Area */}
+          <section className="lg:col-span-8 flex flex-col gap-lg">
+            {searchStatus === Status.SUCCESS && weatherData && geoData && (
+              <>
+                {/* Hourly Forecast (Horizontal Scroll) */}
+                <div className="glass-panel p-lg rounded-[2rem]">
+                  <div className="flex justify-between items-center mb-lg">
+                    <h2 className="font-headline-md text-headline-md text-on-surface">Hourly Forecast</h2>
+                    <div className="bg-surface-container rounded-full p-1 flex gap-1">
+                      <button className="bg-primary-container text-white px-4 py-1 rounded-full font-label-caps text-label-caps transition-all">HOURLY</button>
+                      <button className="text-on-surface-variant px-4 py-1 rounded-full font-label-caps text-label-caps hover:bg-white/50 transition-all">DAILY</button>
+                    </div>
+                  </div>
+                  <div className="flex gap-md overflow-x-auto pb-4 scrollbar-hide">
+                    {/* Hour Items - Mock data for now */}
+                    <div className="flex-shrink-0 flex flex-col items-center gap-3 bg-white/60 p-md rounded-2xl border border-white/40 min-w-[80px]">
+                      <span className="font-label-caps text-label-caps text-on-surface-variant">Now</span>
+                      <span className="material-symbols-outlined text-primary text-3xl" style={{fontVariationSettings: "'FILL' 1"}}>sunny</span>
+                      <span className="font-headline-md text-headline-md text-on-surface">24°</span>
+                    </div>
+                    <div className="flex-shrink-0 flex flex-col items-center gap-3 bg-primary-container text-white p-md rounded-2xl shadow-lg min-w-[80px]">
+                      <span className="font-label-caps text-label-caps opacity-80">14:00</span>
+                      <span className="material-symbols-outlined text-3xl" style={{fontVariationSettings: "'FILL' 1"}}>sunny</span>
+                      <span className="font-headline-md text-headline-md">25°</span>
+                    </div>
+                    <div className="flex-shrink-0 flex flex-col items-center gap-3 bg-white/60 p-md rounded-2xl border border-white/40 min-w-[80px]">
+                      <span className="font-label-caps text-label-caps text-on-surface-variant">15:00</span>
+                      <span className="material-symbols-outlined text-primary text-3xl">cloud</span>
+                      <span className="font-headline-md text-headline-md text-on-surface">24°</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bento Grid of Detailed Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                  {/* Air Quality */}
+                  <div className="glass-panel p-lg rounded-[2rem] flex flex-col">
+                    <div className="flex items-center gap-2 mb-md">
+                      <span className="material-symbols-outlined text-primary">air</span>
+                      <h3 className="font-label-caps text-label-caps text-on-surface-variant">AIR QUALITY</h3>
+                    </div>
+                    <div className="flex-grow flex flex-col justify-center">
+                      <div className="flex justify-between items-end mb-sm">
+                        <span className="font-headline-md text-headline-md text-on-surface">Good (18)</span>
+                        <span className="font-label-caps text-label-caps text-primary">OPTIMAL</span>
+                      </div>
+                      <div className="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#D1F8EF] to-primary w-[18%]"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* UV Index */}
+                  <div className="glass-panel p-lg rounded-[2rem] flex flex-col">
+                    <div className="flex items-center gap-2 mb-md">
+                      <span className="material-symbols-outlined text-primary">wb_sunny</span>
+                      <h3 className="font-label-caps text-label-caps text-on-surface-variant">UV INDEX</h3>
+                    </div>
+                    <div className="flex-grow flex flex-col justify-center">
+                      <div className="flex justify-between items-end mb-sm">
+                        <span className="font-headline-md text-headline-md text-on-surface">Low (2)</span>
+                        <span className="font-label-caps text-label-caps text-on-surface-variant">USE PROTECTION</span>
+                      </div>
+                      <div className="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-yellow-200 to-tertiary-container w-[20%]"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 7-Day Forecast (Full Width) */}
+                  <div className="md:col-span-2 glass-panel p-lg rounded-[2rem]">
+                    <h3 className="font-headline-md text-headline-md text-on-surface mb-lg">7-Day Forecast</h3>
+                    <UpcomingWeather weather={weatherData} temperatureUnit={temperatureUnit} />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {searchStatus === Status.ERROR && <WeatherNotFound />}
+          </section>
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full border-t border-white/40 bg-white/40 backdrop-blur-md mt-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center px-8 py-12 space-y-6 md:space-y-0 max-w-7xl mx-auto">
-          <div className="flex flex-col items-center md:items-start">
-            <span className="text-lg font-black text-primary mb-2">SkyGlass</span>
-            <p className="text-sm font-body-md leading-relaxed text-on-surface-variant">© 2024 SkyGlass Meteorology. Radiant, Reliable, and Uplifting.</p>
-          </div>
-          <nav className="flex gap-gutter">
-            <a className="text-primary underline decoration-2 font-body-md text-sm" href="#">Forecasts</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-sm" href="#">Air Quality</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-sm" href="#">Radar</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-sm" href="#">Settings</a>
-          </nav>
-        </div>
-      </footer>
+      <Footer />
 
-      {/* FAB */}
-      <div className="fixed bottom-margin-mobile right-margin-mobile">
-        <button className="bg-primary text-on-primary w-14 h-14 rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-transform">
-          <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>my_location</span>
-        </button>
-      </div>
+      {/* FAB for adding location */}
+      <button className="fixed bottom-8 right-8 w-14 h-14 bg-primary-container text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+        <span className="material-symbols-outlined text-3xl">add_location</span>
+      </button>
     </div>
   );
 }
