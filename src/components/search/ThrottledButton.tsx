@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import _throttle from 'lodash/throttle';
 
 type ButtonProps = {
-  title: String;
+  title: string;
   onClick: () => void;
   delay?: number;
 }

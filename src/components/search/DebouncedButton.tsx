@@ -3,7 +3,7 @@ import _debounce from "lodash/debounce";
 import { Status } from "../common/fetchGeoData";
 
 type ButtonProps = {
-  title: String;
+  title: string;
   onClick: () => void;
   delay?: number;
   status?: Status;

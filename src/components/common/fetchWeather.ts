@@ -3,17 +3,9 @@ import type { GeoData } from "./fetchGeoData";
 
 const url = "https://api.open-meteo.com/v1/forecast";
 
-type FetchWeatherParams = {
-  latitude: number;
-  longitude: number;
-  current?: string[];
-  hourly?: string[];
-  daily?: string[];
-  temperatureUnit?: string
-};
-
 export type WeatherData = {
   current: CurrentWeatherData;
+  daily: DailyWeatherData[];
 };
 
 export type CurrentWeatherData = {
@@ -28,52 +20,49 @@ export type CurrentWeatherData = {
   rain: number;
 };
 
+export type DailyWeatherData = {
+  time: Date;
+  weatherCode: number;
+  temperatureMax: number;
+  temperatureMin: number;
+};
+
 export enum TempUnit {
   CELCIUS = "°C",
   FAHRENHEIT = "°F"
 }
 
-const CURRENT_PARAMS = [
-  "temperature_2m",
-  "weather_code",
-  "wind_speed_10m",
-  "wind_direction_10m",
-  "wind_gusts_10m",
-  "relative_humidity_2m",
-  "apparent_temperature",
-  "rain",
-];
-
-const HOURLY_PARAMS = ["temperature_2m", "precipitation"];
-const DAILY_PARAMS = ["weather_code", "temperature_2m_max,temperature_2m_min"];
-
-const fetchWeather = async (props: GeoData) => {
-  const params: FetchWeatherParams = {
-    longitude: props.longitude,
+const fetchWeather = async (props: GeoData): Promise<WeatherData> => {
+  const params = {
     latitude: props.latitude,
-    current: CURRENT_PARAMS,
-    // hourly: HOURLY_PARAMS,
-    // daily: DAILY_PARAMS
-    // temperatureUnit: "fahrenheit"
+    longitude: props.longitude,
+    current: [
+      "temperature_2m",
+      "weather_code",
+      "wind_speed_10m",
+      "wind_direction_10m",
+      "wind_gusts_10m",
+      "relative_humidity_2m",
+      "apparent_temperature",
+      "rain"
+    ],
+    daily: [
+      "weather_code",
+      "temperature_2m_max",
+      "temperature_2m_min"
+    ],
+    timezone: "auto"
   };
 
   const responses = await fetchWeatherApi(url, params);
 
-  // Helper function to form time ranges
-  // const range = (start: number, stop: number, step: number) =>
-  //   Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
-
-  // Process first location. Add a for-loop for multiple locations or weather models
+  // Process first location
   const response = responses[0];
-
-  // Attributes for timezone and location
   const utcOffsetSeconds = response.utcOffsetSeconds();
 
   const current = response.current()!;
-  const hourly = response.hourly()!;
   const daily = response.daily()!;
 
-  // Note: The order of weather variables in the URL query and the indices below need to match!
   const weatherData: WeatherData = {
     current: {
       time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
@@ -86,20 +75,19 @@ const fetchWeather = async (props: GeoData) => {
       apparentTemperature: current.variables(6)!.value(),
       rain: current.variables(7)!.value(),
     },
+    daily: [],
   };
 
-  // 'weatherData' now contains a simple structure with arrays with datetime and weather data
-  console.log(
-    `\nCurrent time: ${weatherData.current.time}`,
-    `\nCurrent temperature_2m: ${weatherData.current.temperature}`,
-    `\nCurrent weatherCode: ${weatherData.current.weatherCode}`,
-    `\nCurrent windSpeed_10m: ${weatherData.current.windSpeed}`,
-    `\nCurrent windDirection_10m: ${weatherData.current.windDirection}`,
-    `\nCurrent windGusts_10m: ${weatherData.current.windGusts}`,
-    `\nCurrent relativeHumidity_2m: ${weatherData.current.relativeHumidity}`,
-    `\nCurrent apparentTemperature: ${weatherData.current.apparentTemperature}`,
-    `\nCurrent rain: ${weatherData.current.rain}`
-  );
+  const dailyLength = daily.variables(0)!.valuesLength();
+  const startTime = Number(daily.time());
+  for (let i = 0; i < dailyLength; i++) {
+    weatherData.daily.push({
+      time: new Date((startTime + utcOffsetSeconds + i * 86400) * 1000), // Add days in seconds
+      weatherCode: daily.variables(0)!.valuesArray()![i],
+      temperatureMax: daily.variables(1)!.valuesArray()![i],
+      temperatureMin: daily.variables(2)!.valuesArray()![i],
+    });
+  }
 
   return weatherData;
 };

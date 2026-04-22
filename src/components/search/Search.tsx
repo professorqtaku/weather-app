@@ -1,30 +1,72 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import _debounce from "lodash/debounce";
-import DebouncedButton from "./DebouncedButton";
-import fetchWeather from "../common/fetchWeather";
-import fetchGeoData, { Status } from "../common/fetchGeoData";
+import fetchWeather, { type WeatherData } from "../common/fetchWeather";
+import fetchGeoData, { Status, type GeoData } from "../common/fetchGeoData";
 
 type SearchProps = {
-  setWeatherData: Function;
-  setGeoData: Function;
-  setSearchStatus: Function;
+  setWeatherData: (data: WeatherData) => void;
+  setGeoData: (data: GeoData) => void;
+  setSearchStatus: (status: Status) => void;
   searchStatus: Status;
 };
+
 const Search = (props: SearchProps) => {
-  const { setWeatherData, setGeoData, setSearchStatus, searchStatus } = props;
+  const { setWeatherData, setGeoData, setSearchStatus } = props;
   const [inputValue, setInputValue] = useState("");
+  const [suggestions, setSuggestions] = useState<GeoData[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const fetchSuggestions = useCallback(
+    _debounce(async (query: string) => {
+      if (query.trim().length < 2) {
+        setSuggestions([]);
+        setShowDropdown(false);
+        return;
+      }
+      const geoData = await fetchGeoData({ name: query, count: 10 });
+      if (geoData) {
+        setSuggestions(geoData);
+        setShowDropdown(true);
+      } else {
+        setSuggestions([]);
+        setShowDropdown(false);
+      }
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    fetchSuggestions(inputValue);
+  }, [inputValue, fetchSuggestions]);
+
+  useEffect(() => {
+    return () => {
+      fetchSuggestions.cancel();
+    };
+  }, [fetchSuggestions]);
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
 
-  const handleSearch = async () => {
+  const handleSelectSuggestion = async (suggestion: GeoData) => {
+    setInputValue(`${suggestion.name}, ${suggestion.country}`);
+    setShowDropdown(false);
     setSearchStatus(Status.LOADING);
-    console.log(inputValue);
+    localStorage.setItem("latest-input", suggestion.name);
+    const weatherData = await fetchWeather(suggestion);
+    setGeoData(suggestion);
+    setWeatherData(weatherData);
+    setSearchStatus(Status.SUCCESS);
+  };
+
+  const handleSearch = async () => {
+    if (!inputValue.trim()) return;
+    setSearchStatus(Status.LOADING);
     localStorage.setItem("latest-input", inputValue);
     const geoData = await fetchGeoData({ name: inputValue });
 
-    if (geoData == null) {
+    if (geoData == null || geoData.length === 0) {
       setSearchStatus(Status.ERROR);
       return;
     }
@@ -36,34 +78,38 @@ const Search = (props: SearchProps) => {
     setSearchStatus(Status.SUCCESS);
   };
 
-  // update onInput
-  const debounceFn = useMemo(() => {
-    return _debounce(handleInput, 1000);
-  }, [handleInput]);
-
-  // Clean up the debounced function on unmount
-  useEffect(() => {
-    return () => {
-      debounceFn.cancel();
-    };
-  }, [debounceFn]);
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
-    <div className="flex w-auto bg-pink-200 p-2 rounded-md place-items-center">
-      <div className="w-5/6 bg-white rounded-full px-2 py-1">
+    <div className="relative">
+      <div className="glass-panel rounded-xl flex items-center px-md py-3 shadow-[0_30px_60px_-15px_rgba(54,116,181,0.1)] focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+        <span className="material-symbols-outlined text-outline mr-sm">search</span>
         <input
-          id="search-input"
-          name="search"
+          className="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder-outline"
+          placeholder="Search for a city or airport"
           type="text"
-          placeholder="Stad/land"
-          className="min-w-0 rounded-lg h-auto py-2 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 w-full focus:outline-none transition duration-300 ease-in-out" 
           value={inputValue}
           onChange={handleInput}
+          onKeyPress={handleKeyPress}
         />
       </div>
-      <div className="w-1/6 ml-2">
-        <DebouncedButton title="Search" onClick={handleSearch} status={searchStatus} />
-      </div>
+      {showDropdown && suggestions.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-2 glass-panel rounded-xl shadow-xl overflow-hidden z-20 max-h-60 overflow-y-auto">
+          {suggestions.map((suggestion, index) => (
+            <div
+              key={index}
+              className="px-md py-3 hover:bg-white/40 cursor-pointer border-b border-white/20 last:border-b-0"
+              onClick={() => handleSelectSuggestion(suggestion)}
+            >
+              <p className="font-body-md text-on-surface">{suggestion.name}, {suggestion.country}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

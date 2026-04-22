@@ -10,18 +10,19 @@ export enum Status {
 }
 
 export type GeoProps = {
-    name: String;
+    name: string;
+    count?: number;
 }
 
 export type GeoData = {
-    name: String;
-    country: String;
+    name: string;
+    country: string;
     latitude: number;
     longitude: number;
 }
 
-const getEndpoint = ({name}: GeoProps) => {
-    return `${endpoint}?name=${name}&count=1&language=en&format=json`;
+const getEndpoint = ({name, count = 1}: GeoProps) => {
+    return `${endpoint}?name=${name}&count=${count}&language=en&format=json`;
 }
 
 const fetchGeoData = async (props: GeoProps): Promise<GeoData[] | null> => {
