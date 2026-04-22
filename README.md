@@ -34,9 +34,10 @@ Another section to show the weather of upcoming days.
 
 ## Further development
 * Create the daily weather section, here I would make a toolbar with date, max/min temperature and then render the list of info.
-* Make a design in maybe Figma, I felt stuck when not having a clear vision of the design.
 * Translate the weather code and show actual image
-* Implement the weather toggle, there are already preperation for that.
 * Write tickets to have more focus on each task.
 * Add loading spinner, maybe on the search button
-* Add search on key down
+
+# Issues
+* Hourly only shows weather of upcoming 2 hours.
+* Search suggestions (dropdown) still shown after selecting a city.
